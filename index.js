@@ -37,7 +37,7 @@ class CloudWatchLogGroupClassPlugin {
         return;
       }
 
-      // Add infrequent access log group class
+      // Add infrequent access log group
       const infrequentAccessLogGroup = {
         Type: "AWS::Logs::LogGroup",
         Properties: {
