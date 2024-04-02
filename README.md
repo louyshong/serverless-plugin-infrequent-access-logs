@@ -7,8 +7,8 @@ As CloudFormation [does not support changing log group classes](https://docs.aws
 
 Notes: 
 - Any existing log groups managed by Serverless will remain in your CloudFormation stack.
-- When removing this plugin, any log groups created by this plugin will also be deleted from your CloudFormation stack.
-- When setting `infrequentAccessLogs: false`, any IA log groups created by this plugin will remain.
+- When removing this plugin, any IA log groups created by this plugin will also be deleted from your CloudFormation stack.
+- When setting `infrequentAccessLogs: false`, the IA log groups created by this plugin will remain but will not be used by your lambdas.
 
 ## Usage
 ```
