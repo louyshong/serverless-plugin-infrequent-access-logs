@@ -10,10 +10,9 @@ class CloudWatchLogGroupClassPlugin {
 
   isBoolean(input) {
     if (typeof input === "boolean") {
-      return input;
-    } else {
-      throw new Error("infrequentAccessLogs must be either true or false");
+      return true;
     }
+    return false;
   }
 
   configureLogGroup(globalInfrequentAccess) {
@@ -32,10 +31,30 @@ class CloudWatchLogGroupClassPlugin {
       const localInfrequentAccess =
         service.functions[lambda].infrequentAccessLogs;
 
-      if (!localInfrequentAccess && !globalInfrequentAccess) {
-        // Either global or local value must exist
-        return;
+      if (
+        !this.isBoolean(localInfrequentAccess) &&
+        !this.isBoolean(globalInfrequentAccess)
+      ) {
+        // Either global or local value must be valid
+        throw new Error("infrequentAccessLogs must be either true or false");
       }
+
+      // Local value overrides global value
+      const isInfrequentAccess =
+        localInfrequentAccess ?? globalInfrequentAccess;
+
+      service.custom && service.custom.infrequentAccessLogs
+        ? this.isBoolean(service.custom.infrequentAccessLogs)
+        : null;
+
+      const lambdaLogicalId =
+        service.provider.compiledCloudFormationTemplate.Resources[
+          `${this.provider.naming.getNormalizedFunctionName(
+            lambda
+          )}LambdaFunction`
+        ];
+
+      const iaLogGroupLogicalId = `${lambda}PluginIALogGroup`;
 
       // Add infrequent access log group
       const infrequentAccessLogGroup = {
@@ -45,28 +64,18 @@ class CloudWatchLogGroupClassPlugin {
           LogGroupClass: "INFREQUENT_ACCESS",
         },
       };
-
-      // Decide log group class
-      const isInfrequentAccess = localInfrequentAccess
-        ? this.isBoolean(localInfrequentAccess)
-        : globalInfrequentAccess;
-
-      const lambdaLogicalId =
-        service.provider.compiledCloudFormationTemplate.Resources[
-          `${this.provider.naming.getNormalizedFunctionName(lambda)}LambdaFunction`
-        ];
-
-      const iaLogGroupLogicalId = `${lambda}PluginIALogGroup`;
+  
+      // Add IA log group to service resources
+      // even if it may be unused to prevent deletion
+      resources.Resources[iaLogGroupLogicalId] = infrequentAccessLogGroup;
 
       if (isInfrequentAccess) {
-        // Add IA log group to service resources
-        resources.Resources[iaLogGroupLogicalId] = infrequentAccessLogGroup;
         // Associate the lambda with the IA log group
         lambdaLogicalId.DependsOn = [iaLogGroupLogicalId].concat(
           lambdaLogicalId.DependsOn || []
         );
         lambdaLogicalId.Properties.LoggingConfig = {
-          LogGroup: iaLogGroupLogicalId
+          LogGroup: iaLogGroupLogicalId,
         };
       }
     });
@@ -76,9 +85,7 @@ class CloudWatchLogGroupClassPlugin {
     const service = this.serverless.service;
     // Get global value if it exists
     const globalInfrequentAccess =
-      service.custom && service.custom.infrequentAccessLogs
-        ? this.isBoolean(service.custom.infrequentAccessLogs)
-        : null;
+      service.custom && service.custom.infrequentAccessLogs;
 
     this.configureLogGroup(globalInfrequentAccess);
   }
