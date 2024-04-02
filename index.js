@@ -36,7 +36,7 @@ class CloudWatchLogGroupClassPlugin {
         !this.isBoolean(globalInfrequentAccess)
       ) {
         // Either global or local value must be valid
-        throw new Error("infrequentAccessLogs must be either true or false");
+        throw new Error("infrequentAccessLogs must be either boolean true or false");
       }
 
       // Local value overrides global value
