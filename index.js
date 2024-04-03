@@ -8,11 +8,14 @@ class CloudWatchLogGroupClassPlugin {
     };
   }
 
-  isBoolean(input) {
+  sanitiseBooleanParam(input) {
     if (typeof input === "boolean") {
-      return true;
+      return input;
+    } else {
+      throw new Error(
+        "infrequentAccessLogs must be either boolean true or false"
+      );
     }
-    return false;
   }
 
   configureLogGroup(globalInfrequentAccess) {
@@ -31,21 +34,10 @@ class CloudWatchLogGroupClassPlugin {
       const localInfrequentAccess =
         service.functions[lambda].infrequentAccessLogs;
 
-      if (
-        !this.isBoolean(localInfrequentAccess) &&
-        !this.isBoolean(globalInfrequentAccess)
-      ) {
-        // Either global or local value must be valid
-        throw new Error("infrequentAccessLogs must be either boolean true or false");
-      }
-
-      // Local value overrides global value
-      const isInfrequentAccess =
-        localInfrequentAccess ?? globalInfrequentAccess;
-
-      service.custom && service.custom.infrequentAccessLogs
-        ? this.isBoolean(service.custom.infrequentAccessLogs)
-        : null;
+      // Local value overrides global value if defined
+      const isInfrequentAccess = localInfrequentAccess
+        ? this.sanitiseBooleanParam(localInfrequentAccess)
+        : globalInfrequentAccess;
 
       const lambdaLogicalId =
         service.provider.compiledCloudFormationTemplate.Resources[
@@ -64,7 +56,7 @@ class CloudWatchLogGroupClassPlugin {
           LogGroupClass: "INFREQUENT_ACCESS",
         },
       };
-  
+
       // Add IA log group to service resources
       // even if it may be unused to prevent deletion
       resources.Resources[iaLogGroupLogicalId] = infrequentAccessLogGroup;
@@ -83,9 +75,12 @@ class CloudWatchLogGroupClassPlugin {
 
   beforeDeploy() {
     const service = this.serverless.service;
-    // Get global value if it exists
+
+    // Get global value if defined, otherwise default to false
     const globalInfrequentAccess =
-      service.custom && service.custom.infrequentAccessLogs;
+      service.custom && service.custom.infrequentAccessLogs
+        ? this.sanitiseBooleanParam(service.custom.infrequentAccessLogs)
+        : false;
 
     this.configureLogGroup(globalInfrequentAccess);
   }
