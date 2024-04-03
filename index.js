@@ -6,6 +6,22 @@ class CloudWatchLogGroupClassPlugin {
     this.hooks = {
       "package:compileFunctions": this.beforeDeploy.bind(this),
     };
+
+    // Extend validation schema, note that this is not
+    // reliable as configValidationMode may not be set to 'error'.
+    // It is mostly here to remove the warning in the console.
+    serverless.configSchemaHandler.defineCustomProperties({
+      type: 'object',
+      properties: {
+        infrequentAccessLogs: { type: 'boolean' },
+      },
+    });
+
+    serverless.configSchemaHandler.defineFunctionProperties("aws", {
+      properties: {
+        infrequentAccessLogs: { type: "boolean" },
+      },
+    });
   }
 
   sanitiseBooleanParam(input) {
