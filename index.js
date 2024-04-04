@@ -8,12 +8,11 @@ class CloudWatchLogGroupClassPlugin {
     };
 
     // Extend validation schema, note that this is not
-    // reliable as configValidationMode may not be set to 'error'.
-    // It is mostly here to remove the warning in the console.
+    // reliable as configValidationMode may not be set to 'error'
     serverless.configSchemaHandler.defineCustomProperties({
-      type: 'object',
+      type: "object",
       properties: {
-        infrequentAccessLogs: { type: 'boolean' },
+        infrequentAccessLogs: { type: "boolean" },
       },
     });
 
@@ -34,7 +33,23 @@ class CloudWatchLogGroupClassPlugin {
     }
   }
 
-  configureLogGroup(globalInfrequentAccess) {
+  sanitiseLogRetentionParam(input) {
+    // Valid values obtained from CloudFormation documentation
+    const validRetentionInDays = [
+      1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827,
+      2192, 2557, 2922, 3288, 3653,
+    ];
+
+    if (typeof input === "number" && validRetentionInDays.includes(input)) {
+      return input;
+    } else {
+      throw new Error(
+        `infrequentAccessLogRetention must be one of ${validRetentionInDays}`
+      );
+    }
+  }
+
+  configureLogGroup(globalInfrequentAccess, globalLogRetention) {
     const service = this.serverless.service;
 
     if (!service.functions) {
@@ -50,10 +65,17 @@ class CloudWatchLogGroupClassPlugin {
       const localInfrequentAccess =
         service.functions[lambda].infrequentAccessLogs;
 
+      const localLogRetention =
+        service.functions[lambda].infrequentAccessLogRetention;
+
       // Local value overrides global value if defined
       const isInfrequentAccess = localInfrequentAccess
         ? this.sanitiseBooleanParam(localInfrequentAccess)
         : globalInfrequentAccess;
+
+      const logRetention = localLogRetention
+        ? this.sanitiseLogRetentionParam(localLogRetention)
+        : globalLogRetention;
 
       const lambdaLogicalId =
         service.provider.compiledCloudFormationTemplate.Resources[
@@ -70,6 +92,7 @@ class CloudWatchLogGroupClassPlugin {
         Properties: {
           LogGroupName: `/aws/lambda/plugin/ia/${lambda}`,
           LogGroupClass: "INFREQUENT_ACCESS",
+          ...(logRetention && { RetentionInDays: logRetention }),
         },
       };
 
@@ -98,7 +121,15 @@ class CloudWatchLogGroupClassPlugin {
         ? this.sanitiseBooleanParam(service.custom.infrequentAccessLogs)
         : false;
 
-    this.configureLogGroup(globalInfrequentAccess);
+    // Get global value if defined, otherwise default to null (never expires)
+    const globalLogRetention =
+      service.custom && service.custom.infrequentAccessLogRetention
+        ? this.sanitiseLogRetentionParam(
+            service.custom.infrequentAccessLogRetention
+          )
+        : null;
+
+    this.configureLogGroup(globalInfrequentAccess, globalLogRetention);
   }
 }
 
