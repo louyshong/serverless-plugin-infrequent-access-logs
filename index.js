@@ -21,6 +21,21 @@ class CloudWatchLogGroupClassPlugin {
         infrequentAccessLogs: { type: "boolean" },
       },
     });
+
+    serverless.configSchemaHandler.defineCustomProperties({
+      type: "object",
+      properties: {
+        infrequentAccessLogRetention: { type: "number" },
+      },
+    });
+
+    serverless.configSchemaHandler.defineFunctionProperties("aws", {
+      properties: {
+        infrequentAccessLogRetention: { type: "number" },
+      },
+    });
+
+    
   }
 
   sanitiseBooleanParam(input) {
