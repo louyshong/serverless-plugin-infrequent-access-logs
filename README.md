@@ -1,5 +1,6 @@
 # serverless-plugin-infrequent-access-logs
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+[![tests](https://github.com/louyshong/serverless-plugin-infrequent-access-logs/actions/workflows/node.js.yml/badge.svg)](https://github.com/louyshong/serverless-plugin-infrequent-access-logs/actions/workflows/node.js.yml)
 
 This plugin allows you to create and configure infrequent access log groups for your lambdas. 
 
