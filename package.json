@@ -4,7 +4,7 @@
   "description": "Serverless plugin to enable infrequent access CloudWatch log groups.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "devDependencies": {
     "jest": "^29.7.0"

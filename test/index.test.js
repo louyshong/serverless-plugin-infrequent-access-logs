@@ -7,6 +7,7 @@ function mockGetNormalizedFunctionName(funcName) {
 
 function createTestInstance(config) {
   const resources = {};
+  const serviceResources = {};
 
   Object.keys(config.functions).forEach((func) => {
     resources[`${mockGetNormalizedFunctionName(func)}LambdaFunction`] = {
@@ -20,7 +21,7 @@ function createTestInstance(config) {
     testInstance: new CloudWatchLogGroupClassPlugin(
       {
         service: {
-          resources: {},
+          resources: serviceResources,
           functions: config.functions,
           custom: config.custom,
           provider: {
@@ -44,6 +45,7 @@ function createTestInstance(config) {
       {}
     ),
     resources: resources,
+    serviceResources: serviceResources
   };
 }
 
@@ -125,16 +127,96 @@ describe("Infrequent access undefined globally", () => {
   });
 });
 
-// describe("IA log retention set globally", () => {
-//   test("Local value overrides global value");
+describe("IA log retention set globally", () => {
+  const custom = {
+    infrequentAccessLogs: true,
+    infrequentAccessLogRetention: 30
+  };
 
-//   test("Local value undefined");
+  test("Local value overrides global value", () => {
+    const { testInstance, serviceResources } = createTestInstance({
+      functions: {
+        func1: {
+          infrequentAccessLogRetention: 7,
+        },
+      },
+      custom: custom,
+    });
 
-//   test("Throw error on invalid retention value");
-// });
+    testInstance.beforeDeploy();
 
-// describe("IA log retention undefined globally", () => {
-//   test("Local value defined");
+    expect(
+      serviceResources.Resources["func1PluginIALogGroup"]
+        .Properties.RetentionInDays
+    ).toEqual(7);
+  });
 
-//   test("Local value undefined");
-// });
+  test("Local value undefined", () => {
+    const { testInstance, serviceResources } = createTestInstance({
+      functions: {
+        func1: {}
+      },
+      custom: custom,
+    });
+
+    testInstance.beforeDeploy();
+
+    expect(
+      serviceResources.Resources["func1PluginIALogGroup"]
+        .Properties.RetentionInDays
+    ).toEqual(30);
+  });
+
+  test("Throw error on invalid retention value", () => {
+    const { testInstance } = createTestInstance({
+      functions: {
+        func1: {
+          infrequentAccessLogRetention: 4
+        }
+      },
+      custom: custom,
+    });
+
+    expect(() => {testInstance.beforeDeploy()}).toThrow();
+  });
+});
+
+describe("IA log retention undefined globally", () => {
+  const custom = {
+    infrequentAccessLogs: true
+  };
+
+  test("Local value defined", () => {
+    const { testInstance, serviceResources } = createTestInstance({
+      functions: {
+        func1: {
+          infrequentAccessLogRetention: 7,
+        },
+      },
+      custom: custom,
+    });
+
+    testInstance.beforeDeploy();
+
+    expect(
+      serviceResources.Resources["func1PluginIALogGroup"]
+        .Properties.RetentionInDays
+    ).toEqual(7);
+  });
+
+  test("Local value undefined", () => {
+    const { testInstance, serviceResources } = createTestInstance({
+      functions: {
+        func1: {},
+      },
+      custom: custom,
+    });
+
+    testInstance.beforeDeploy();
+
+    expect(
+      serviceResources.Resources["func1PluginIALogGroup"]
+        .Properties.RetentionInDays
+    ).toBeUndefined();
+  });
+});
