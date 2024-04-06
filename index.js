@@ -34,8 +34,6 @@ class CloudWatchLogGroupClassPlugin {
         infrequentAccessLogRetention: { type: "number" },
       },
     });
-
-    
   }
 
   sanitiseBooleanParam(input) {
