@@ -1,4 +1,5 @@
 # serverless-plugin-infrequent-access-logs
+[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
 
 This plugin allows you to create and configure infrequent access log groups for your lambdas. 
 
