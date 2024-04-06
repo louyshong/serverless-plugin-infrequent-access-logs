@@ -82,7 +82,7 @@ class CloudWatchLogGroupClassPlugin {
         service.functions[lambda].infrequentAccessLogRetention;
 
       // Local value overrides global value if defined
-      const isInfrequentAccess = localInfrequentAccess
+      const isInfrequentAccess = localInfrequentAccess !== undefined
         ? this.sanitiseBooleanParam(localInfrequentAccess)
         : globalInfrequentAccess;
 
@@ -130,7 +130,7 @@ class CloudWatchLogGroupClassPlugin {
 
     // Get global value if defined, otherwise default to false
     const globalInfrequentAccess =
-      service.custom && service.custom.infrequentAccessLogs
+      service.custom && service.custom.infrequentAccessLogs !== undefined
         ? this.sanitiseBooleanParam(service.custom.infrequentAccessLogs)
         : false;
 
