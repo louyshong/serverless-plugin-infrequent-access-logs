@@ -87,6 +87,21 @@ describe("Infrequent access set globally", () => {
         .Properties.LoggingConfig
     ).toBeDefined();
   });
+
+  test("Throw error on non-boolean value", () => {
+    const { testInstance, resources } = createTestInstance({
+      functions: {
+        func1: {
+          infrequentAccessLogs: "false",
+        },
+      },
+      custom: custom,
+    });
+
+    expect(() => {
+      testInstance.beforeDeploy()
+    }).toThrow();
+  })
 });
 
 describe("Infrequent access undefined globally", () => {
