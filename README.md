@@ -8,6 +8,11 @@ As CloudFormation [does not support changing log group classes](https://docs.aws
 - `/aws/lambda/ia/${lambda}`
 
 ## Usage
+1. Install the plugin.
+```
+npm install --save-dev serverless-plugin-infrequent-access-logs
+```
+2. Register it in your `serverless.yml` file.
 ```
 service: sample
 

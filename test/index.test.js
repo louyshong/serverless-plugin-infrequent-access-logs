@@ -1,4 +1,3 @@
-const { createECDH } = require("crypto");
 const CloudWatchLogGroupClassPlugin = require("../index");
 
 function mockGetNormalizedFunctionName(funcName) {
