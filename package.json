@@ -15,5 +15,16 @@
   "engines": {
     "node": ">=10.0"
   },
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/louyshong/serverless-plugin-infrequent-access-logs.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "serverless",
+    "aws",
+    "lambda",
+    "cloudwatch",
+    "logs"
+  ]
 }
