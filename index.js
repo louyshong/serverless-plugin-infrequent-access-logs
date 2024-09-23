@@ -114,7 +114,7 @@ class CloudWatchLogGroupClassPlugin {
       // Add role permissions to push logs to the IA log group
       const lambdaRoleLogicalId = lambdaObject.Properties.Role["Fn::GetAtt"][0];
       const lambdaRoleObject = service.provider.compiledCloudFormationTemplate.Resources[lambdaRoleLogicalId];
-      lambdaRoleObject.Policies.push(
+      lambdaRoleObject.Properties.Policies.push(
         {
           PolicyName: `${service.functions[lambda].name}-ia-log-group-policy`,
           PolicyDocument: {
