@@ -90,12 +90,9 @@ class CloudWatchLogGroupClassPlugin {
         ? this.sanitiseLogRetentionParam(localLogRetention)
         : globalLogRetention;
 
-      const lambdaLogicalId =
-        service.provider.compiledCloudFormationTemplate.Resources[
-          `${this.provider.naming.getNormalizedFunctionName(
-            lambda
-          )}LambdaFunction`
-        ];
+      const lambdaLogicalId = `${this.provider.naming.getNormalizedFunctionName(lambda)}LambdaFunction`;
+      const lambdaObject =
+        service.provider.compiledCloudFormationTemplate.Resources[lambdaLogicalId];
 
       const iaLogGroupLogicalId = `${lambda}PluginIALogGroup`;
       const iaLogGroupName = `/aws/lambda/plugin/ia/${service.functions[lambda].name}`;
@@ -114,12 +111,40 @@ class CloudWatchLogGroupClassPlugin {
       // even if it may be unused to prevent deletion
       resources.Resources[iaLogGroupLogicalId] = infrequentAccessLogGroup;
 
+      // Add role permissions to push logs to the IA log group
+      const lambdaRoleLogicalId = lambdaObject.Properties.Role["Fn::GetAtt"][0];
+      const lambdaRoleObject = service.provider.compiledCloudFormationTemplate.Resources[lambdaRoleLogicalId];
+      lambdaRoleObject.Policies.PolicyDocument.Statement.push(
+        {
+          "Effect": "Allow",
+          "Action": [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource": [
+            {
+              "Fn::Join": [
+                ":",
+                [
+                  "arn",
+                  { Ref: "AWS::Partition" },
+                  "logs",
+                  { Ref: "AWS::Region" },
+                  { Ref: "AWS::AcccountId" },
+                  `log-group:${iaLogGroupName}:*`
+                ]
+              ]
+            }
+          ]
+        }
+      );
+
       if (isInfrequentAccess) {
         // Associate the lambda with the IA log group
-        lambdaLogicalId.DependsOn = [iaLogGroupLogicalId].concat(
-          lambdaLogicalId.DependsOn || []
+        lambdaObject.DependsOn = [iaLogGroupLogicalId].concat(
+          lambdaObject.DependsOn || []
         );
-        lambdaLogicalId.Properties.LoggingConfig = {
+        lambdaObject.Properties.LoggingConfig = {
           LogGroup: iaLogGroupName,
         };
       }

@@ -11,10 +11,24 @@ function createTestInstance(config) {
   Object.keys(config.functions).forEach((func) => {
     resources[`${mockGetNormalizedFunctionName(func)}LambdaFunction`] = {
       DependsOn: [`${mockGetNormalizedFunctionName(func)}LogGroup`],
-      Properties: {}
+      Properties: {
+        Role: {
+          "Fn::GetAtt": [
+            "MockIamRole"
+          ]
+        }
+      }
     };
     resources[`${mockGetNormalizedFunctionName(func)}LogGroup`] = {};
   });
+
+  resources["MockIamRole"] = {
+    Policies: {
+      PolicyDocument: {
+        Statement: []
+      }
+    }
+  };
 
   return {
     testInstance: new CloudWatchLogGroupClassPlugin(
