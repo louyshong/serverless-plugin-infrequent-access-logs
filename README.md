@@ -6,7 +6,7 @@
 This plugin allows you to create and configure infrequent access log groups for your lambdas. 
 
 As CloudFormation [does not support changing log group classes](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html), this plugin will instead add new infrequent access log groups to your CloudFormation stack following the pattern: 
-- `/aws/lambda/plugin/ia/${lambda}`
+- `/aws/lambda/plugin/ia/${lambda-name}`
 
 ## Usage
 1. Install the plugin.

@@ -98,7 +98,7 @@ class CloudWatchLogGroupClassPlugin {
         ];
 
       const iaLogGroupLogicalId = `${lambda}PluginIALogGroup`;
-      const iaLogGroupName = `/aws/lambda/plugin/ia/${lambda}`;
+      const iaLogGroupName = `/aws/lambda/plugin/ia/${service.functions[lambda].name}`;
 
       // Add infrequent access log group
       const infrequentAccessLogGroup = {
