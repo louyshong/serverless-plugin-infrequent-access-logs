@@ -98,12 +98,13 @@ class CloudWatchLogGroupClassPlugin {
         ];
 
       const iaLogGroupLogicalId = `${lambda}PluginIALogGroup`;
+      const iaLogGroupName = `/aws/lambda/plugin/ia/${lambda}`;
 
       // Add infrequent access log group
       const infrequentAccessLogGroup = {
         Type: "AWS::Logs::LogGroup",
         Properties: {
-          LogGroupName: `/aws/lambda/plugin/ia/${lambda}`,
+          LogGroupName: iaLogGroupName,
           LogGroupClass: "INFREQUENT_ACCESS",
           ...(logRetention && { RetentionInDays: logRetention }),
         },
@@ -119,7 +120,7 @@ class CloudWatchLogGroupClassPlugin {
           lambdaLogicalId.DependsOn || []
         );
         lambdaLogicalId.Properties.LoggingConfig = {
-          LogGroup: iaLogGroupLogicalId,
+          LogGroup: iaLogGroupName,
         };
       }
     });
