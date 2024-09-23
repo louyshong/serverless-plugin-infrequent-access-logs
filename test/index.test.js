@@ -23,11 +23,7 @@ function createTestInstance(config) {
   });
 
   resources["MockIamRole"] = {
-    Policies: {
-      PolicyDocument: {
-        Statement: []
-      }
-    }
+    Policies: []
   };
 
   return {

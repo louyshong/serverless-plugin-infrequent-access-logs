@@ -114,28 +114,36 @@ class CloudWatchLogGroupClassPlugin {
       // Add role permissions to push logs to the IA log group
       const lambdaRoleLogicalId = lambdaObject.Properties.Role["Fn::GetAtt"][0];
       const lambdaRoleObject = service.provider.compiledCloudFormationTemplate.Resources[lambdaRoleLogicalId];
-      lambdaRoleObject.Policies.PolicyDocument.Statement.push(
+      lambdaRoleObject.Policies.push(
         {
-          "Effect": "Allow",
-          "Action": [
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Resource": [
-            {
-              "Fn::Join": [
-                ":",
-                [
-                  "arn",
-                  { Ref: "AWS::Partition" },
-                  "logs",
-                  { Ref: "AWS::Region" },
-                  { Ref: "AWS::AcccountId" },
-                  `log-group:${iaLogGroupName}:*`
+          PolicyName: `${service.functions[lambda].name}-ia-log-group-policy`,
+          PolicyDocument: {
+            Version: "2024-09-23",
+            Statement: [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "Resource": [
+                  {
+                    "Fn::Join": [
+                      ":",
+                      [
+                        "arn",
+                        { Ref: "AWS::Partition" },
+                        "logs",
+                        { Ref: "AWS::Region" },
+                        { Ref: "AWS::AcccountId" },
+                        `log-group:${iaLogGroupName}:*`
+                      ]
+                    ]
+                  }
                 ]
-              ]
-            }
-          ]
+              }
+            ]
+          }
         }
       );
 
