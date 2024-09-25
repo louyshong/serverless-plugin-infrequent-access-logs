@@ -124,7 +124,6 @@ class CloudWatchLogGroupClassPlugin {
                 "Effect": "Allow",
                 "Action": [
                   "logs:CreateLogStream",
-                  "logs:PutLogEvents"
                 ],
                 "Resource": [
                   {
@@ -137,6 +136,27 @@ class CloudWatchLogGroupClassPlugin {
                         { Ref: "AWS::Region" },
                         { Ref: "AWS::AccountId" },
                         `log-group:${iaLogGroupName}:*`
+                      ]
+                    ]
+                  }
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "logs:PutLogEvents"
+                ],
+                "Resource": [
+                  {
+                    "Fn::Join": [
+                      ":",
+                      [
+                        "arn",
+                        { Ref: "AWS::Partition" },
+                        "logs",
+                        { Ref: "AWS::Region" },
+                        { Ref: "AWS::AccountId" },
+                        `log-group:${iaLogGroupName}:*:*`
                       ]
                     ]
                   }
