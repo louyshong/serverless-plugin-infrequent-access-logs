@@ -118,7 +118,7 @@ class CloudWatchLogGroupClassPlugin {
         {
           PolicyName: `${service.functions[lambda].name}-ia-log-group-policy`,
           PolicyDocument: {
-            Version: "2024-09-23",
+            Version: "2012-10-17",
             Statement: [
               {
                 "Effect": "Allow",
