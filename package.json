@@ -1,6 +1,6 @@
 {
   "name": "serverless-plugin-infrequent-access-logs",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Serverless plugin to enable infrequent access CloudWatch log groups.",
   "main": "index.js",
   "scripts": {
