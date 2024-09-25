@@ -135,7 +135,7 @@ class CloudWatchLogGroupClassPlugin {
                         { Ref: "AWS::Partition" },
                         "logs",
                         { Ref: "AWS::Region" },
-                        { Ref: "AWS::AcccountId" },
+                        { Ref: "AWS::AccountId" },
                         `log-group:${iaLogGroupName}:*`
                       ]
                     ]
