@@ -1,5 +1,5 @@
 # serverless-plugin-infrequent-access-logs
-[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+[![serverless](https://s3-us-west-2.amazonaws.com/assets.blog.serverless.com/v3-badge.svg)](http://www.serverless.com)
 [![tests](https://github.com/louyshong/serverless-plugin-infrequent-access-logs/actions/workflows/run-tests.yml/badge.svg)](https://github.com/louyshong/serverless-plugin-infrequent-access-logs/actions/workflows/run-tests.yml)
 [![codecov](https://codecov.io/gh/louyshong/serverless-plugin-infrequent-access-logs/graph/badge.svg?token=89NHFISJAU)](https://codecov.io/gh/louyshong/serverless-plugin-infrequent-access-logs)
 
