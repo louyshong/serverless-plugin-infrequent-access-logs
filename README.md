@@ -3,7 +3,7 @@
 [![tests](https://github.com/louyshong/serverless-plugin-infrequent-access-logs/actions/workflows/run-tests.yml/badge.svg)](https://github.com/louyshong/serverless-plugin-infrequent-access-logs/actions/workflows/run-tests.yml)
 [![codecov](https://codecov.io/gh/louyshong/serverless-plugin-infrequent-access-logs/graph/badge.svg?token=89NHFISJAU)](https://codecov.io/gh/louyshong/serverless-plugin-infrequent-access-logs)
 
-This plugin allows you to create and configure infrequent access log groups for your lambdas. 
+This plugin allows you to create and configure infrequent access log groups for your lambdas. Infrequent access CloudWatch logs are 50% cheaper in data ingestion cost and are suitable for workloads that do not require the more advanced features of CloudWatch.
 
 As CloudFormation [does not support changing log group classes](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html), this plugin will instead add new infrequent access log groups to your CloudFormation stack following the pattern: 
 - `/aws/lambda/plugin/ia/${lambda-name}`
